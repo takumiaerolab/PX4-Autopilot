@@ -41,7 +41,7 @@
 
 using namespace matrix;
 
-FlightTaskManualPosition::FlightTaskManualPosition() : _collision_prevention(this)
+FlightTaskManualPosition::FlightTaskManualPosition()
 {
 
 }
@@ -142,13 +142,15 @@ void FlightTaskManualPosition::_updateSetpoints()
 	_updateXYlock(); // check for position lock
 
 	// check if an external yaw handler is active and if yes, let it update the yaw setpoints
-	if (_weathervane_yaw_handler != nullptr && _weathervane_yaw_handler->is_active()) {
+	_weathervane.update();
+
+	if (_weathervane.is_active()) {
 		_yaw_setpoint = NAN;
 
 		// only enable the weathervane to change the yawrate when position lock is active (and thus the pos. sp. are NAN)
 		if (PX4_ISFINITE(_position_setpoint(0)) && PX4_ISFINITE(_position_setpoint(1))) {
 			// vehicle is steady
-			_yawspeed_setpoint += _weathervane_yaw_handler->get_weathervane_yawrate();
+			_yawspeed_setpoint += _weathervane.get_weathervane_yawrate();
 		}
 	}
 }
